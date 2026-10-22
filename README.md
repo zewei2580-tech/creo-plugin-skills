@@ -81,8 +81,6 @@ Automated window operations require a supported Computer Use capability in the a
 
 ## Contact
 
-- WeChat: **ZEWEI2580**
-- Email: **992823232@qq.com**
 - Email: **zewei2580@gmail.com**
 
 Maintained by [zewei2580-tech](https://github.com/zewei2580-tech).
