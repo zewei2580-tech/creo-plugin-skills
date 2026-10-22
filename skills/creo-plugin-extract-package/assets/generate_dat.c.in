@@ -1,0 +1,64 @@
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <wchar.h>
+#include <string.h>
+
+static int fail(const wchar_t *message,int silent){
+ if(!silent)MessageBoxW(NULL,message,L"生成 DAT · 未完成",MB_OK|MB_ICONWARNING);
+ return 1;
+}
+int WINAPI wWinMain(HINSTANCE instance,HINSTANCE previous,PWSTR command,int show){
+ wchar_t root[32768],path[32768],target[32768],temporary[32768],backup[32768],message[32768],body[4096];
+ const wchar_t *required[]={@@REQUIRED_FILES@@};
+ char bytes[16384],old[16384];DWORD n,written=0,read=0,attrs;HANDLE f;BOOL substituted=FALSE;UINT codepage=GetACP();int i,size,silent=command&&wcsstr(command,L"--silent");
+ (void)instance;(void)previous;(void)show;
+ n=GetModuleFileNameW(NULL,root,_countof(root));
+ if(!n||n>=_countof(root))return fail(L"无法读取工具所在目录。",silent);
+ {wchar_t *slash=wcsrchr(root,L'\\');if(!slash)return fail(L"目录无效。",silent);*slash=0;}
+ if(wcslen(root)>200)return fail(L"解压路径过长。请把完整插件文件夹移到较短的目录，例如 C:\\@@FOLDER_NAME@@，然后重新双击。",silent);
+ for(i=0;root[i];i++)if(root[i]>127)return fail(L"完整解压路径含中文或其他非英文字符，Creo 可能无法读取注册文件。请将整个文件夹移到 C:\\@@FOLDER_NAME@@，再生成 DAT。",silent);
+ for(i=0;i<(int)_countof(required);i++){
+  swprintf_s(path,_countof(path),L"%ls\\%ls",root,required[i]);attrs=GetFileAttributesW(path);
+  if(attrs==INVALID_FILE_ATTRIBUTES||(attrs&FILE_ATTRIBUTE_DIRECTORY)){
+   swprintf_s(message,_countof(message),L"插件文件不齐全：\n%ls\n\n请完整解压，不要只复制生成工具或 DLL。",required[i]);return fail(message,silent);
+  }
+ }
+ swprintf_s(target,_countof(target),L"%ls\\protk.dat",root);
+ swprintf_s(body,_countof(body),L"name @@APP_ID@@\r\ndescription @@APP_ID@@ @@VERSION@@\r\ntoolkit OBJECT\r\ncreo_type PARAMETRIC\r\nstartup dll\r\nexec_file %ls\\@@DLL_NAME@@\r\ntext_dir %ls\\text\r\nallow_stop true\r\ndelay_start false\r\nend\r\n",root,root);
+ /* ASCII names and paths intentionally avoid locale-dependent parsing.
+  * No code-page dependent characters are written to the registration file. */
+ size=WideCharToMultiByte(codepage,codepage==CP_UTF8?WC_ERR_INVALID_CHARS:WC_NO_BEST_FIT_CHARS,body,-1,bytes,sizeof(bytes),NULL,codepage==CP_UTF8?NULL:&substituted);
+ if(!size||substituted)return fail(L"注册路径编码失败，未修改现有 DAT。",silent);size--;
+ attrs=GetFileAttributesW(target);
+ if(attrs!=INVALID_FILE_ATTRIBUTES){
+  if(attrs&FILE_ATTRIBUTE_DIRECTORY)return fail(L"protk.dat 是文件夹，无法生成同名注册文件。",silent);
+  f=CreateFileW(target,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+  if(f==INVALID_HANDLE_VALUE)return fail(L"现有 protk.dat 无法读取，请关闭占用它的程序后重试。",silent);
+  {DWORD fileSize=GetFileSize(f,NULL);BOOL ok=ReadFile(f,old,sizeof(old),&read,NULL);CloseHandle(f);
+   if(!ok)return fail(L"无法读取现有注册文件，未作修改。",silent);
+   if(fileSize==(DWORD)size&&read==(DWORD)size&&!memcmp(bytes,old,size))goto success;
+  }
+  {SYSTEMTIME time;GetLocalTime(&time);
+   swprintf_s(backup,_countof(backup),L"%ls.bak.%04u%02u%02u_%02u%02u%02u_%03u_%lu",target,time.wYear,time.wMonth,time.wDay,time.wHour,time.wMinute,time.wSecond,time.wMilliseconds,GetCurrentProcessId());
+   if(!CopyFileW(target,backup,TRUE))return fail(L"无法备份原 protk.dat，未作修改。请把完整插件目录移到有写入权限的位置再重试。",silent);
+  }
+ }
+ swprintf_s(temporary,_countof(temporary),L"%ls.new.%lu",target,GetCurrentProcessId());
+ f=CreateFileW(temporary,GENERIC_WRITE,0,NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,NULL);
+ if(f==INVALID_HANDLE_VALUE)return fail(L"不能在当前目录创建注册文件。请完整解压到桌面或其他可写目录，再双击本工具。",silent);
+ {BOOL ok=WriteFile(f,bytes,size,&written,NULL)&&written==(DWORD)size;
+  if(ok)ok=FlushFileBuffers(f);CloseHandle(f);
+  if(!ok){DeleteFileW(temporary);return fail(L"注册文件写入失败，现有 DAT 保持不变。",silent);}
+ }
+ if(!MoveFileExW(temporary,target,MOVEFILE_REPLACE_EXISTING|MOVEFILE_WRITE_THROUGH)){
+  DeleteFileW(temporary);return fail(L"无法替换 protk.dat，原文件保持不变。请检查目录权限及文件占用。",silent);
+ }
+success:
+ if(!silent){
+  swprintf_s(message,_countof(message),L"@@APP_ID@@ @@VERSION@@ 注册文件已准备好：\n\n%ls\n\n进入 Creo：工具 → 辅助应用程序 → 注册\n选择这个 protk.dat，然后点击“启动”。\n\n本工具不修改 config.pro，也不修改任何模型。",target);
+  MessageBoxW(NULL,message,L"生成 DAT · 完成",MB_OK|MB_ICONINFORMATION);
+ }
+ return 0;
+}

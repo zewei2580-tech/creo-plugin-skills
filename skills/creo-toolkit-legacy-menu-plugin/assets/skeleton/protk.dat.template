@@ -1,0 +1,10 @@
+name        {{PLUGIN_NAME}}
+description {{PLUGIN_DESCRIPTION}}
+toolkit     OBJECT
+creo_type   PARAMETRIC
+startup     dll
+exec_file   {{ABSOLUTE_PLUGIN_ROOT}}\{{DLL_NAME}}
+text_dir    {{ABSOLUTE_PLUGIN_ROOT}}\text
+allow_stop  true
+delay_start false
+end

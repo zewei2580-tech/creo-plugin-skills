@@ -1,0 +1,26 @@
+param(
+    [Parameter(Mandatory=$true)]
+    [string]$CreoCommon
+)
+
+$ErrorActionPreference = "Stop"
+$root = $PSScriptRoot
+$include = Join-Path $CreoCommon "protoolkit\includes"
+$lib = Join-Path $CreoCommon "protoolkit\x86e_win64\obj"
+$source = Join-Path $root "src\plugin.c"
+$output = Join-Path $root "{{DLL_NAME}}"
+$vswhere = "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe"
+
+if (-not (Test-Path -LiteralPath $include)) { throw "Creo Toolkit includes not found: $include" }
+if (-not (Test-Path -LiteralPath $lib)) { throw "Creo Toolkit libraries not found: $lib" }
+if (-not (Test-Path -LiteralPath $vswhere)) { throw "vswhere.exe not found" }
+
+$install = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+if (-not $install) { throw "Visual Studio C++ tools not found" }
+$vcvars = Join-Path $install "VC\Auxiliary\Build\vcvars64.bat"
+if (-not (Test-Path -LiteralPath $vcvars)) { throw "vcvars64.bat not found" }
+
+$command = "`"$vcvars`" && cl /nologo /source-charset:utf-8 /EHsc /MD /LD `"$source`" /I `"$include`" /link /LIBPATH:`"$lib`" protk_dllmd_NU.lib ucore.lib udata.lib user32.lib /OUT:`"$output`""
+cmd /c $command
+if ($LASTEXITCODE -ne 0) { throw "Toolkit build failed" }
+Write-Output "Built: $output"

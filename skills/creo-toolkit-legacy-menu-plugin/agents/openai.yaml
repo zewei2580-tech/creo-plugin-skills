@@ -1,0 +1,4 @@
+interface:
+  display_name: "Creo Toolkit 传统菜单插件"
+  short_description: "构建、自动启动注册并在线切换传统菜单式 Creo Toolkit 插件"
+  default_prompt: "使用 $creo-toolkit-legacy-menu-plugin 构建或更新传统菜单式 Creo Toolkit 插件，并写入 Creo 实际读取的 config.pro。"

@@ -1,0 +1,20 @@
+{{MENU_LABEL_KEY}}
+插件工具
+Plugin Tools
+#
+{{COMMAND_LABEL_KEY}}
+示例命令
+Example Command
+#
+{{COMMAND_HELP_KEY}}
+执行示例 Toolkit 命令
+Run the example Toolkit command
+#
+{{COMMAND_DESC_KEY}}
+这是一个传统 Toolkit 菜单命令
+This command belongs to the legacy Toolkit menu
+#
+{{RUN_MESSAGE_KEY}}
+%CI示例命令已执行。
+%CIExample command executed.
+#

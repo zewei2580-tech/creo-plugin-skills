@@ -1,0 +1,4 @@
+interface:
+  display_name: "Creo 插件功能提取与打包"
+  short_description: "把现有 Creo 插件的指定功能独立打包，核对运行环境并验证真实注册入口"
+  default_prompt: "使用 $creo-plugin-extract-package，把现有 Creo 插件中指定的功能提取成可分享的独立插件，附带 DAT、完整依赖和安装教程，并验证实际注册和运行。"

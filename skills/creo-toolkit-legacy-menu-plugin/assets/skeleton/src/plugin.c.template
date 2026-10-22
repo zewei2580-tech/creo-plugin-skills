@@ -1,0 +1,86 @@
+#include <ProToolkit.h>
+#include <ProUICmd.h>
+#include <ProMenuBar.h>
+#include <ProMessage.h>
+
+static ProFileName g_msg_file = L"{{MESSAGE_FILE}}";
+
+static uiCmdAccessState plugin_access(uiCmdAccessMode mode)
+{
+    (void)mode;
+    return ACCESS_AVAILABLE;
+}
+
+static int command_action(uiCmdCmdId command, uiCmdValue *value, void *data)
+{
+    (void)command;
+    (void)value;
+    (void)data;
+    (void)ProMessageDisplay(g_msg_file, "{{RUN_MESSAGE_KEY}}");
+    return 0;
+}
+
+__declspec(dllexport) int user_initialize(
+    int argc,
+    char *argv[],
+    char *version,
+    char *build,
+    wchar_t errbuf[80])
+{
+    uiCmdCmdId command_id = NULL;
+    ProError err;
+
+    (void)argc;
+    (void)argv;
+    (void)version;
+    (void)build;
+    if (errbuf != NULL)
+        errbuf[0] = L'\0';
+
+    err = ProCmdActionAdd(
+        "{{COMMAND_NAME}}",
+        command_action,
+        uiProe2ndImmediate,
+        plugin_access,
+        PRO_B_TRUE,
+        PRO_B_TRUE,
+        &command_id);
+    if (err == PRO_TK_E_FOUND)
+        err = ProCmdCmdIdFind("{{COMMAND_NAME}}", &command_id);
+    if (err != PRO_TK_NO_ERROR)
+        return (int)err;
+
+    (void)ProCmdDesignate(
+        command_id,
+        "{{COMMAND_LABEL_KEY}}",
+        "{{COMMAND_HELP_KEY}}",
+        "{{COMMAND_DESC_KEY}}",
+        g_msg_file);
+
+    err = ProMenubarMenuAdd(
+        "{{MENU_NAME}}",
+        "{{MENU_LABEL_KEY}}",
+        "Info",
+        PRO_B_TRUE,
+        g_msg_file);
+    if (err != PRO_TK_NO_ERROR && err != PRO_TK_E_FOUND)
+        return (int)err;
+
+    err = ProMenubarmenuPushbuttonAdd(
+        "{{MENU_NAME}}",
+        "{{BUTTON_NAME}}",
+        "{{COMMAND_LABEL_KEY}}",
+        "{{COMMAND_HELP_KEY}}",
+        NULL,
+        PRO_B_TRUE,
+        command_id,
+        g_msg_file);
+    if (err != PRO_TK_NO_ERROR && err != PRO_TK_E_FOUND)
+        return (int)err;
+
+    return PRO_TK_NO_ERROR;
+}
+
+__declspec(dllexport) void user_terminate(void)
+{
+}
