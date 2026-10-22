@@ -6,6 +6,15 @@ Reusable skills for AI-assisted Creo TOOLKIT plugin development: **Ribbon interf
 
 ## Why I built this
 
+While developing Creo plugins, I realized that explaining the requirement to AI was only the beginning. The time-consuming questions came afterward:
+
+- The code is written—but does it compile?
+- The DLL is built—but can Creo load it?
+- The button appears—but are the labels and icons displayed correctly?
+- It works on my computer—but will it work on another one?
+
+After encountering these issues repeatedly, I started organizing the development workflow, checks, and lessons into **SKILLs** that could be reused. I mainly work with **Creo 12 and later**.
+
 During more than 500 plugin-version iterations, I repeatedly had to stop the old plugin in Creo, remove its old registration, register the new version, start it, and close Auxiliary Applications before testing again.
 
 Those repetitive clicks became exhausting. Writing code was only part of the work; getting the intended DLL into the right Creo session was another task every single time.
@@ -49,10 +58,6 @@ Identify the exact Creo session and target plugin
   → run the actual menu/Ribbon command and verify the result
 ```
 
-Removing a registration means removing an Auxiliary Applications entry, not deleting DLLs or models. First installations skip steps with no old application. Existing authorization carries across iterations of the same task; documentation-only, build-only, or explicitly manual requests do not authorize runtime switching.
-
-Persistent startup configuration is separate from a live reload. Do not overwrite loaded DLLs, force-close Creo, discard unsaved work, or change unrelated plugin registrations. If unloading or automation is unavailable, report the specific blocker and the unverified stage.
-
 ## Algorithm first, real button second
 
 Validate CAD algorithms with an independent TOOLKIT test program connected to a clearly identified **real Creo test session**. Then integrate the tested implementation into the formal plugin and verify it from the actual button.
@@ -67,17 +72,9 @@ Compilation, initialization, and a visible button are not substitutes for a veri
 
 My work currently uses Creo 12 and later. Plugins I develop with the Creo 12 SDK can be used in Creo 12 and Creo 13 when validated for those environments. Follow each actual plugin's supported-version information; this repository does not make every generated DLL universally compatible.
 
-Prepare the target Creo TOOLKIT SDK, an appropriate licensing environment, and a compatible Windows C/C++ toolchain. Build templates require your actual Creo Common Files path. No proprietary SDK, Creo system DLL, or customer CAD model is included.
-
-The detailed skills reference [PTC's compatibility rules](https://support.ptc.com/help/creo_toolkit/protoolkit_pma/r12/usascii/creo_toolkit/user_guide/Version_Compatibility_Creo_ParametricCreo_and_Creo_Toolkit.html).
-
 ## Install
 
-Copy the three complete folders under `skills/` into your assistant's skill directory. For Codex, use `~/.codex/skills/`, or the `skills` folder under your configured Codex home. Keep each skill's references, scripts, and assets together.
-
-Invoke the relevant folder name or let the assistant select the matching skill. Specify the desired function, target Creo version, UI style, and authorized model changes/runtime tests. Replace template placeholders when generating a concrete plugin project.
-
-Automated window operations require a supported Computer Use capability in the assistant's environment. These skill files are not an independently executable automatic-registration program. Where GUI control is unavailable, provide a manual handoff and mark runtime validation pending.
+[Download the SKILLS package](Creo_Plugin_Skills.zip), attach it to **Codex**, and ask: **"Install these skills for me."**
 
 ## Contact
 
