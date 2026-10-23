@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI 连接 Creo"
+  short_description: "识别 Creo 会话并验证 CREOSON/MCP 或原生 TOOLKIT 连接"
+  default_prompt: "请用 $creo-ai-connection 连接并核对目标 Creo 会话，先执行只读检查，再完成我授权的操作。"

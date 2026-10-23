@@ -2,7 +2,7 @@
 
 [中文介绍](README.zh-CN.md)
 
-Reusable skills for AI-assisted Creo TOOLKIT plugin development: **Ribbon interfaces, traditional menus, automated version switching, real command validation, and standalone packaging**.
+Reusable skills for AI-assisted Creo work: **connecting an AI agent to the right Creo session**, building Ribbon or menu plugins, switching versions, validating real commands, and packaging standalone plugins.
 
 ## Why I built this
 
@@ -23,13 +23,18 @@ I collected that experience into these skills so an AI assistant can follow a re
 
 These are skill instructions, references, scripts, and templates—not precompiled plugins or a bundled PTC SDK.
 
-## Three skills
+## Four skills
 
 | Skill | Purpose | UI convention |
 |---|---|---|
+| [AI connection to Creo](skills/creo-ai-connection/SKILL.md) | Identify the target session and verify a CREOSON/MCP or native TOOLKIT connection | No UI required; read-first session checks |
 | [Ribbon tab plugin](skills/creo-toolkit-ribbon-tab-plugin/SKILL.md) | Dedicated tabs and grouped commands | Uniform 16×16 icons plus Chinese labels; matching 32×32 resources |
 | [Traditional menu plugin](skills/creo-toolkit-legacy-menu-plugin/SKILL.md) | Small utilities and compact command lists | Chinese text menus; icons are optional initially |
 | [Extract and package](skills/creo-plugin-extract-package/SKILL.md) | Turn selected functionality into a shareable plugin | Required commands, resources, dependencies, and registration files only |
+
+## Connect AI to Creo
+
+The connection skill describes two paths: an existing local CREOSON service exposed to an AI client through MCP, or a version-matched asynchronous TOOLKIT/OTK controller for native operations. It checks service health, the exact Creo process and active model, then a read-only command before any authorized model change. With multiple Creo sessions, an ambiguous connection is a diagnostic result, not permission to modify a model. The skills ZIP contains instructions and references; install CREOSON or build the native controller separately for your own environment.
 
 ## Interface examples
 
@@ -70,7 +75,7 @@ Compilation, initialization, and a visible button are not substitutes for a veri
 
 ## Versions and environment
 
-My work currently uses Creo 12 and later. Plugins I develop with the Creo 12 SDK can be used in Creo 12 and Creo 13 when validated for those environments. Follow each actual plugin's supported-version information; this repository does not make every generated DLL universally compatible.
+My work began on Creo 12 and later, and the packaging skill now records SDK provenance and build evidence for older versions too. An older SDK build may work on a newer Creo, but compatibility must be verified on every target installation. Follow each plugin's tested-version information; this repository does not make every generated DLL universally compatible. PTC SDK archives are kept local and are not included here.
 
 ## Install
 

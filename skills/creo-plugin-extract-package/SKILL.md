@@ -33,6 +33,7 @@ description: Extract selected features from an existing Creo TOOLKIT plugin into
 
 ## Creo 跨版本兼容与构建基线
 
+- 多版本构建前按 [SDK 来源与兼容性核验](references/sdk-provenance-and-compatibility.md) 记录介质、CAB、架构、头文件、链接库、编译工具链和逐阶段验证结果。已提取 SDK 可用于构建，但不能把“已打包 SDK”或“成功链接 DLL”写成目标版本已实测可用。
 - 打包前确认接收者的 Creo 大版本及完整小版本，不能仅按开发电脑当前安装或打开的最高版本选择 SDK。
 - 兼容是有方向的：较新 SDK 构建的 TOOLKIT 应用不支持在较旧 Creo 上运行；较旧 SDK 构建的应用通常可在较新 Creo 上运行，但跨大版本可能需要接口适配。依据：[PTC 版本兼容规则](https://support.ptc.com/help/creo_toolkit/protoolkit_pma/r12/usascii/creo_toolkit/user_guide/Version_Compatibility_Creo_ParametricCreo_and_Creo_Toolkit.html)。
 - 当目标同时包含 Creo 12、13 时，优先尝试以最低目标版本（例如 Creo 12）的 SDK 作为共同基线，编译 DLL 及配套异步处理程序。检查实际使用的 API、结构体字段和运行库依赖；不能仅修改 DAT 描述、文件名或版本检查来绕过不兼容。
